@@ -2,6 +2,7 @@
   "name": "cybergogne-gateway-mcp",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@10.33.0",
   "scripts": {
     "dev": "pnpm --filter @cybergogne/mcp-server dev",
     "start:prod": "node apps/mcp-server/dist/index.js",
