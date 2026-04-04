@@ -1,0 +1,33 @@
+{
+  "name": "@cybergogne/mcp-server",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsc -p tsconfig.build.json && pnpm --filter @cybergogne/widget build",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src test --ext .ts",
+    "test": "vitest run --passWithNoTests",
+    "test:integration": "vitest run --passWithNoTests apps/mcp-server/test/**/*.test.ts"
+  },
+  "dependencies": {
+    "@cybergogne/approvals": "workspace:*",
+    "@cybergogne/audit": "workspace:*",
+    "@cybergogne/common": "workspace:*",
+    "@cybergogne/confluence": "workspace:*",
+    "@cybergogne/publishing": "workspace:*",
+    "@cybergogne/proposals": "workspace:*",
+    "@cybergogne/registry": "workspace:*",
+    "@cybergogne/schemas": "workspace:*",
+    "@cybergogne/scope-resolver": "workspace:*",
+    "@modelcontextprotocol/ext-apps": "latest",
+    "@modelcontextprotocol/sdk": "latest",
+    "zod": "latest"
+  }
+}

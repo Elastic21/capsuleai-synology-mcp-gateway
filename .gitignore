@@ -1,0 +1,13 @@
+node_modules
+dist
+coverage
+out
+.env
+.env.synology
+.env.synology.local
+.env.synology.ghcr
+.env.synology.ghcr.local
+.env.docker
+data
+.DS_Store
+*.log

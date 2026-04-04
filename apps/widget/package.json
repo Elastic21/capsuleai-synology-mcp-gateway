@@ -1,0 +1,12 @@
+{
+  "name": "@cybergogne/widget",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "typecheck": "echo \"widget: no typecheck\"",
+    "lint": "echo \"widget: no lint\"",
+    "test": "vitest run --passWithNoTests"
+  }
+}

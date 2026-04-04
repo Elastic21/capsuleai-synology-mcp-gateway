@@ -1,0 +1,77 @@
+# Exemple de manifest d’entrée pour résoudre les vraies valeurs Confluence et approbateurs.
+# Ce fichier n’est pas la source de vérité finale : il sert au bootstrap.
+
+schema_version: v1
+atlassian_sites:
+  - site: cybergogne.atlassian.net
+    auth_profile: cybergogne-prod
+
+scopes:
+  - scope_id: internal-commercial-prod
+    atlassian_site: cybergogne.atlassian.net
+    space_hint:
+      key: CYBCOM
+      name: Gestion Commerciale
+    page_hints:
+      root:
+        title: "Gestion Commerciale"
+      default_parent:
+        title: "20 Comptes-rendus"
+      ai_inbox:
+        title: "90 AI Inbox"
+    approver_hint:
+      principal_type: external_directory_group
+      candidate_refs:
+        - cg-commercial-approvers
+
+  - scope_id: internal-finance-prod
+    atlassian_site: cybergogne.atlassian.net
+    space_hint:
+      key: CYBFIN
+      name: Gestion Financière
+    page_hints:
+      root:
+        title: "Gestion Financière"
+      default_parent:
+        title: "20 Comptes-rendus"
+      ai_inbox:
+        title: "90 AI Inbox"
+    approver_hint:
+      principal_type: external_directory_group
+      candidate_refs:
+        - cg-finance-approvers
+
+  - scope_id: client-smdm-prod
+    atlassian_site: cybergogne.atlassian.net
+    space_hint:
+      key: CLSMDM
+      name: Saint-Martin-de-la-Mer
+    page_hints:
+      root:
+        title: "Projet Client - Saint-Martin-de-la-Mer"
+      default_parent:
+        title: "20 Comptes-rendus"
+      ai_inbox:
+        title: "90 AI Inbox"
+    approver_hint:
+      principal_type: email_list
+      candidate_refs:
+        - mairie@saintmartindelamer.fr
+
+  - scope_id: program-auxois-morvan-prod
+    atlassian_site: cybergogne.atlassian.net
+    space_hint:
+      key: PAM
+      name: Pays Auxois Morvan
+    page_hints:
+      root:
+        title: "Programme Pays Auxois Morvan"
+      default_parent:
+        title: "20 Comptes-rendus"
+      ai_inbox:
+        title: "90 AI Inbox"
+    approver_hint:
+      principal_type: external_directory_group
+      candidate_refs:
+        - program-pam-approvers
+

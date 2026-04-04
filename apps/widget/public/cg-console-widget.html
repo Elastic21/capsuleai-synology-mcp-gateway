@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cybergogne MCP Console</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg1: #f7efe2;
+        --bg2: #dce9eb;
+        --surface: rgba(255, 252, 247, 0.9);
+        --surface-strong: rgba(255, 255, 255, 0.96);
+        --ink: #10212a;
+        --muted: #56686f;
+        --line: rgba(16, 33, 42, 0.14);
+        --accent: #0d6b6b;
+        --ok: #146b3a;
+        --warn: #946200;
+        --bad: #9e2a1b;
+        --shadow: 0 18px 40px rgba(16, 33, 42, 0.12);
+        font-family: "IBM Plex Sans", "Aptos", "Segoe UI", sans-serif;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; min-height: 100%; }
+      body {
+        padding: 16px;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top left, rgba(255,255,255,.84), transparent 36%),
+          linear-gradient(160deg, var(--bg1), var(--bg2));
+      }
+      a { color: var(--accent); }
+      h1, h2, h3 {
+        margin: 0;
+        font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+        letter-spacing: -.02em;
+      }
+      h1 { font-size: clamp(28px, 5vw, 38px); line-height: 1; margin-top: 10px; }
+      h2 { font-size: 22px; line-height: 1.1; }
+      h3 { font-size: 17px; }
+      p { margin: 0; }
+      .shell { max-width: 1040px; margin: 0 auto; display: grid; gap: 14px; }
+      .hero, .panel {
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        background: var(--surface);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(16px);
+      }
+      .hero { padding: 18px 20px; background:
+        linear-gradient(125deg, rgba(13,107,107,.12), rgba(255,255,255,0)),
+        linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.7)); }
+      .panel { padding: 16px; }
+      .eyebrow, .chip, .meta-pill {
+        display: inline-flex; align-items: center; min-height: 28px;
+        padding: 4px 10px; border-radius: 999px;
+      }
+      .eyebrow {
+        border: 1px solid rgba(13,107,107,.16);
+        background: rgba(13,107,107,.08);
+        color: var(--accent);
+        font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+      }
+      .subtle { color: var(--muted); }
+      .grid { display: grid; gap: 14px; }
+      .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .panel-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+      .panel-header.stack { flex-direction: column; align-items: flex-start; }
+      .stats { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+      .stat, .result-card, .approval-item {
+        padding: 12px 14px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface-strong);
+      }
+      .stat-label, .kv-label {
+        color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em;
+      }
+      .stat-value { display: block; margin-top: 6px; font-weight: 700; }
+      .chips, .actions, .list, .kvs { display: flex; flex-wrap: wrap; gap: 8px; }
+      .list, .kvs { display: grid; gap: 12px; }
+      .chip {
+        border: 1px solid rgba(16,33,42,.12);
+        background: rgba(255,255,255,.8);
+      }
+      .chip.status-draft { background: rgba(13,107,107,.1); color: var(--accent); }
+      .chip.status-pending_approval { background: rgba(148,98,0,.12); color: var(--warn); }
+      .chip.status-approved, .chip.status-published { background: rgba(20,107,58,.12); color: var(--ok); }
+      .chip.status-rejected, .chip.status-rolled_back { background: rgba(158,42,27,.12); color: var(--bad); }
+      .meta-pill { background: rgba(13,107,107,.08); color: var(--accent); font-size: 12px; }
+      .kv { display: grid; gap: 4px; }
+      .kv-value, code, pre { font-family: "IBM Plex Mono", "Cascadia Code", "Consolas", monospace; word-break: break-word; }
+      pre {
+        margin: 0; padding: 14px; border-radius: 16px; overflow: auto;
+        border: 1px solid var(--line); background: rgba(16,33,42,.06); white-space: pre-wrap;
+      }
+      .button {
+        min-height: 42px; padding: 10px 14px; border-radius: 999px; border: 1px solid transparent;
+        cursor: pointer; transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+      }
+      .button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 10px 20px rgba(16,33,42,.12); }
+      .button:disabled { opacity: .52; cursor: not-allowed; box-shadow: none; }
+      .button-primary { background: var(--accent); color: #fff; }
+      .button-secondary { background: rgba(255,255,255,.84); color: var(--ink); border-color: rgba(16,33,42,.16); }
+      .button-danger { background: rgba(158,42,27,.12); color: var(--bad); border-color: rgba(158,42,27,.2); }
+      .callout, .error {
+        padding: 14px 16px; border-radius: 16px;
+      }
+      .callout { border: 1px solid rgba(148,98,0,.18); background: rgba(148,98,0,.08); color: #684d00; }
+      .error { border: 1px solid rgba(158,42,27,.2); background: rgba(158,42,27,.1); color: #6f1f15; }
+      .empty { padding: 24px; text-align: center; color: var(--muted); }
+      @media (max-width: 720px) { body { padding: 12px; } .grid-2 { grid-template-columns: 1fr; } .hero, .panel { padding: 14px; } }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <section class="hero">
+        <div class="eyebrow">Cybergogne MCP Publisher</div>
+        <h1>Widget de revue V1</h1>
+        <p class="subtle" id="heroSubtitle">En attente d'un resultat d'outil.</p>
+      </section>
+      <main id="app" class="grid"></main>
+    </div>
+    <script>
+      const appEl = document.getElementById("app");
+      const heroSubtitleEl = document.getElementById("heroSubtitle");
+      const state = { latestPayload: null, latestInput: null, pendingAction: null, error: null };
+      const esc = (v) => String(v ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+      const arr = (v) => Array.isArray(v) ? v : [];
+      const isObj = (v) => Boolean(v) && typeof v === "object" && !Array.isArray(v);
+      const json = (v) => esc(JSON.stringify(v ?? {}, null, 2));
+      const fmtDate = (v) => {
+        if (!v) return "-";
+        const d = new Date(v);
+        if (Number.isNaN(d.valueOf())) return esc(v);
+        return esc(new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium", timeStyle: "short" }).format(d));
+      };
+      const setState = (patch) => { Object.assign(state, patch); render(); };
+      const errText = (error) => !error ? "Erreur inconnue" : typeof error === "string" ? error : typeof error.message === "string" ? error.message : JSON.stringify(error);
+      function rpcRequest(method, params, timeoutMs = 20000) {
+        const id = crypto.randomUUID();
+        return new Promise((resolve, reject) => {
+          const timer = window.setTimeout(() => { window.removeEventListener("message", onMessage); reject(new Error("Timeout waiting for host response")); }, timeoutMs);
+          function onMessage(event) {
+            const message = event.data;
+            if (!message || message.jsonrpc !== "2.0" || message.id !== id) return;
+            window.clearTimeout(timer);
+            window.removeEventListener("message", onMessage);
+            if (message.error) reject(message.error);
+            else resolve(message.result);
+          }
+          window.addEventListener("message", onMessage);
+          window.parent.postMessage({ jsonrpc: "2.0", id, method, params }, "*");
+        });
+      }
+      async function callTool(name, args, options = {}) {
+        setState({ pendingAction: name, error: null });
+        try {
+          const result = await rpcRequest("tools/call", { name, arguments: args });
+          const structured = result && isObj(result) ? result.structuredContent : null;
+          if (structured && structured.widgetView === "search" && options.mergeSearch) {
+            structured.results = arr(state.latestPayload && state.latestPayload.results).concat(arr(structured.results));
+          }
+          setState({ latestInput: args, latestPayload: structured || state.latestPayload, pendingAction: null });
+          return result;
+        } catch (error) {
+          setState({ pendingAction: null, error: errText(error) });
+          return null;
+        }
+      }
+      const renderError = () => !state.error ? "" : `<section class="error"><strong>Action interrompue.</strong> ${esc(state.error)}</section>`;
+      function renderScope(scope) {
+        if (!isObj(scope)) return "";
+        return `<section class="panel"><div class="panel-header stack"><h2>Scope actif</h2><p class="subtle">Le registre reste la source de verite.</p></div><div class="stats">
+          <div class="stat"><span class="stat-label">Scope</span><span class="stat-value">${esc(scope.scope_id || "-")}</span></div>
+          <div class="stat"><span class="stat-label">Espace</span><span class="stat-value">${esc(scope.confluence_space_key || scope.space_key || "-")}</span></div>
+          <div class="stat"><span class="stat-label">Racine</span><span class="stat-value">${esc(scope.root_page_id || "-")}</span></div>
+          <div class="stat"><span class="stat-label">Politique</span><span class="stat-value">${esc(scope.publication_policy_key || "-")}</span></div>
+        </div></section>`;
+      }
+      function renderSearch(payload) {
+        const results = arr(payload.results);
+        const scope = isObj(payload.scope) ? payload.scope : {};
+        const nextCursor = payload.next_cursor || null;
+        const query = state.latestInput && state.latestInput.query ? state.latestInput.query : "";
+        heroSubtitleEl.textContent = results.length ? `${results.length} resultat(s) charges.` : "Aucun resultat dans le scope courant.";
+        return `${renderError()}${renderScope(scope)}
+          <section class="panel"><div class="panel-header"><div><h2>Resultats de recherche</h2><p class="subtle">Requete: ${esc(query || "(non fournie par l'hote)")}</p></div><div class="chips"><span class="chip">${results.length} resultat(s)</span><span class="chip">curseur: ${esc(nextCursor || "fin")}</span></div></div>
+          ${results.length ? `<div class="list">${results.map((item) => `<article class="result-card"><div class="panel-header"><div><h3>${esc(item.title || "(sans titre)")}</h3><p class="subtle">${esc(item.page_id || "-")}</p></div>${item.web_url ? `<a href="${esc(item.web_url)}" target="_blank" rel="noreferrer">Ouvrir</a>` : ""}</div><p>${esc(item.excerpt || "Aucun extrait fourni.")}</p><div class="chips" style="margin-top:8px;"><span class="meta-pill">version ${esc(item.version || "-")}</span>${arr(item.labels).map((label) => `<span class="meta-pill">${esc(label)}</span>`).join("")}</div></article>`).join("")}</div>` : `<div class="empty">Aucun document visible dans ce scope.</div>`}
+          </section>
+          ${nextCursor ? `<section class="panel"><div class="panel-header"><div><h2>Pagination</h2><p class="subtle">Charge la page suivante sans perdre le contexte.</p></div><button class="button button-primary" data-action="load-more" ${state.pendingAction ? "disabled" : ""}>${state.pendingAction === "render_search_results_widget" ? "Chargement..." : "Charger la suite"}</button></div></section>` : ""}`;
+      }
+      const currentPublication = (payload) => isObj(payload.publication) ? payload.publication : isObj(payload.latest_publication) ? payload.latest_publication : null;
+      const canRollback = (payload) => {
+        const pub = currentPublication(payload);
+        const policy = isObj(payload.publication_policy) ? payload.publication_policy : null;
+        const proposal = isObj(payload.proposal) ? payload.proposal : null;
+        return Boolean(pub && policy && policy.rollback_allowed && pub.action === "update_managed_sections" && proposal && proposal.status === "published");
+      };
+      function renderApprovals(rows) {
+        rows = arr(rows);
+        if (!rows.length) return `<div class="empty">Aucune decision enregistree pour le moment.</div>`;
+        return `<div class="list">${rows.map((item) => `<article class="approval-item"><div class="panel-header"><h3>${esc(item.actor_ref || "acteur inconnu")}</h3><span class="chip status-${esc(item.decision || "draft")}">${esc(item.decision || "-")}</span></div><div class="chips"><span class="meta-pill">${esc(item.approver_group_key || "-")}</span><span class="meta-pill">${fmtDate(item.decided_at)}</span></div>${item.comment ? `<p class="subtle" style="margin-top:8px;">${esc(item.comment)}</p>` : ""}</article>`).join("")}</div>`;
+      }
+      function renderProposal(payload) {
+        const proposal = isObj(payload.proposal) ? payload.proposal : {};
+        const scope = isObj(payload.scope) ? payload.scope : {};
+        const diff = isObj(payload.diff) ? payload.diff : {};
+        const policy = isObj(payload.publication_policy) ? payload.publication_policy : {};
+        const approvals = arr(payload.approvals);
+        const publication = currentPublication(payload);
+        const labels = arr(proposal.labels);
+        const riskFlags = arr(diff.risk_flags);
+        const status = proposal.status || "draft";
+        const targetRef = proposal.target_page_id || proposal.target_parent_page_id || "-";
+        heroSubtitleEl.textContent = `Proposition ${proposal.proposal_id || ""} - statut ${status}.`;
+        return `${renderError()}
+          <section class="panel"><div class="panel-header"><div><h2>${esc(proposal.title || "Proposition sans titre")}</h2><p class="subtle">${esc(proposal.proposal_id || "-")}</p></div><div class="chips"><span class="chip status-${esc(status)}">${esc(status)}</span><span class="chip">${esc(proposal.proposal_type || "-")}</span><span class="chip">${esc(proposal.write_mode || "-")}</span></div></div>
+            <div class="grid grid-2">
+              <div class="kvs">
+                <div class="kv"><span class="kv-label">Scope</span><span class="kv-value">${esc(scope.scope_id || "-")}</span></div>
+                <div class="kv"><span class="kv-label">Espace cible</span><span class="kv-value">${esc(scope.confluence_space_key || "-")}</span></div>
+                <div class="kv"><span class="kv-label">Page cible / parent</span><span class="kv-value">${esc(targetRef)}</span></div>
+                <div class="kv"><span class="kv-label">Politique</span><span class="kv-value">${esc(policy.publication_policy_key || scope.publication_policy_key || "-")}</span></div>
+              </div>
+              <div class="kvs">
+                <div class="kv"><span class="kv-label">Template</span><span class="kv-value">${esc(proposal.template_id || "-")}</span></div>
+                <div class="kv"><span class="kv-label">Type documentaire</span><span class="kv-value">${esc(proposal.doc_type || "-")}</span></div>
+                <div class="kv"><span class="kv-label">Approbations</span><span class="kv-value">${esc(approvals.length)}</span></div>
+                <div class="kv"><span class="kv-label">Rollback</span><span class="kv-value">${policy.rollback_allowed ? "autorise" : "non autorise"}</span></div>
+              </div>
+            </div>
+          </section>
+          ${labels.length ? `<section class="panel"><h2>Labels</h2><div class="chips">${labels.map((label) => `<span class="chip">${esc(label)}</span>`).join("")}</div></section>` : ""}
+          ${riskFlags.length ? `<section class="panel"><div class="panel-header stack"><h2>Indicateurs de risque</h2><p class="subtle">Le diff demande une revue humaine.</p></div><div class="chips">${riskFlags.map((flag) => `<span class="chip">${esc(flag)}</span>`).join("")}</div></section>` : ""}
+          <section class="panel"><div class="panel-header stack"><h2>Diff avant / apres</h2><p class="subtle">Resume structurel puis diff texte brut.</p></div><div class="grid grid-2"><div><h3 style="margin-bottom:10px;">Resume</h3><pre>${json(diff.diff_summary || {})}</pre></div><div><h3 style="margin-bottom:10px;">Texte</h3><pre>${esc(diff.diff_text || "Aucun diff texte disponible.")}</pre></div></div></section>
+          <section class="panel"><div class="panel-header stack"><h2>Decisions humaines</h2><p class="callout">Divergence V1: pas de bouton distinct "Envoyer a validation". Le premier accord peut produire <code>pending_approval</code> si le quorum n'est pas atteint.</p></div>${renderApprovals(approvals)}</section>
+          ${publication ? `<section class="panel"><div class="panel-header"><div><h2>Publication la plus recente</h2><p class="subtle">${esc(publication.publication_id || "-")}</p></div><div class="chips"><span class="chip">${esc(publication.action || "-")}</span><span class="chip">page ${esc(publication.page_id || "-")}</span><span class="chip">version ${esc(publication.version_number || "-")}</span></div></div><div class="chips"><span class="meta-pill">publie par ${esc(publication.published_by || "-")}</span><span class="meta-pill">${fmtDate(publication.published_at)}</span></div></section>` : ""}
+          <section class="panel"><div class="panel-header stack"><h2>Actions widget-only</h2><p class="subtle">Les actions sensibles restent masquees au modele.</p></div><div class="actions">
+            <button class="button button-secondary" data-action="approve" ${["published","rejected","rolled_back"].includes(status) || state.pendingAction ? "disabled" : ""}>${state.pendingAction === "approve_proposal" ? "Approbation..." : "Approuver"}</button>
+            <button class="button button-danger" data-action="reject" ${["published","rejected","rolled_back"].includes(status) || state.pendingAction ? "disabled" : ""}>${state.pendingAction === "reject_proposal" ? "Rejet..." : "Rejeter"}</button>
+            <button class="button button-primary" data-action="publish" ${status !== "approved" || state.pendingAction ? "disabled" : ""}>${state.pendingAction === "publish_approved_proposal" ? "Publication..." : "Publier"}</button>
+            <button class="button button-secondary" data-action="rollback" ${!canRollback(payload) || state.pendingAction ? "disabled" : ""}>${state.pendingAction === "rollback_publication" ? "Rollback..." : "Rollback"}</button>
+          </div></section>`;
+      }
+      function renderFallback(payload) {
+        heroSubtitleEl.textContent = "Rendu brut du payload.";
+        return `${renderError()}<section class="panel"><div class="panel-header stack"><h2>Payload brut</h2><p class="subtle">Vue specialisee indisponible pour cette structure.</p></div><pre>${json(payload)}</pre></section>`;
+      }
+      function render() {
+        if (!state.latestPayload) {
+          heroSubtitleEl.textContent = "En attente d'un resultat d'outil.";
+          appEl.innerHTML = `${renderError()}<section class="panel empty">Ce widget attend <code>render_search_results_widget</code> ou <code>render_proposal_widget</code>.</section>`;
+          return;
+        }
+        if (state.latestPayload.widgetView === "search") { appEl.innerHTML = renderSearch(state.latestPayload); return; }
+        if (state.latestPayload.widgetView === "proposal") { appEl.innerHTML = renderProposal(state.latestPayload); return; }
+        appEl.innerHTML = renderFallback(state.latestPayload);
+      }
+      async function handleAction(action) {
+        const payload = state.latestPayload;
+        const proposal = payload && payload.proposal;
+        const publication = payload ? currentPublication(payload) : null;
+        if (action === "load-more") {
+          const nextCursor = payload && payload.next_cursor;
+          if (!nextCursor) return;
+          await callTool("render_search_results_widget", Object.assign({}, state.latestInput || {}, { cursor: nextCursor }), { mergeSearch: true });
+          return;
+        }
+        if (!proposal || !proposal.proposal_id) { setState({ error: "Aucune proposition active dans le widget." }); return; }
+        if (action === "approve") { await callTool("approve_proposal", { proposal_id: proposal.proposal_id }); return; }
+        if (action === "reject") { await callTool("reject_proposal", { proposal_id: proposal.proposal_id }); return; }
+        if (action === "publish") { await callTool("publish_approved_proposal", { proposal_id: proposal.proposal_id }); return; }
+        if (action === "rollback") {
+          if (!publication || !publication.publication_id) { setState({ error: "Rollback impossible: aucune publication referencee." }); return; }
+          await callTool("rollback_publication", { publication_id: publication.publication_id });
+        }
+      }
+      appEl.addEventListener("click", (event) => {
+        const target = event.target.closest("[data-action]");
+        if (!target) return;
+        void handleAction(target.getAttribute("data-action"));
+      });
+      window.addEventListener("message", (event) => {
+        const message = event.data;
+        if (!message || message.jsonrpc !== "2.0") return;
+        if (message.method === "ui/notifications/tool-input") {
+          setState({ latestInput: message.params && message.params.arguments ? message.params.arguments : state.latestInput });
+          return;
+        }
+        if (message.method !== "ui/notifications/tool-result") return;
+        const params = message.params || {};
+        setState({ latestPayload: params.structuredContent || params || null, error: params.isError ? "Le serveur a retourne une erreur d'outil." : state.error });
+      }, { passive: true });
+      render();
+    </script>
+  </body>
+</html>

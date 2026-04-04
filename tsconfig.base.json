@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2022", "DOM"],
+    "strict": true,
+    "skipLibCheck": true,
+    "declaration": true,
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "paths": {
+      "@cybergogne/common": ["./packages/common/src/index.ts"],
+      "@cybergogne/schemas": ["./packages/schemas/src/index.ts"],
+      "@cybergogne/registry": ["./packages/registry/src/index.ts"],
+      "@cybergogne/scope-resolver": ["./packages/scope-resolver/src/index.ts"],
+      "@cybergogne/confluence": ["./packages/confluence/src/index.ts"],
+      "@cybergogne/diff-engine": ["./packages/diff-engine/src/index.ts"],
+      "@cybergogne/proposals": ["./packages/proposals/src/index.ts"],
+      "@cybergogne/approvals": ["./packages/approvals/src/index.ts"],
+      "@cybergogne/publishing": ["./packages/publishing/src/index.ts"],
+      "@cybergogne/audit": ["./packages/audit/src/index.ts"]
+    }
+  },
+  "exclude": ["node_modules", "dist", "coverage", "out"]
+}

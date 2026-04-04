@@ -1,0 +1,185 @@
+schema_version: v1
+generated_at: '2026-04-03T12:35:52Z'
+publication_policies:
+- publication_policy_key: pp_append_only_reviewed
+  description: Création uniquement de nouvelles pages après validation humaine ; aucune
+    mise à jour de page existante.
+  approval_required: true
+  create_mode: current_page
+  update_mode: none
+  publish_after_approval: true
+  max_pages_per_operation: 1
+  diff_required: true
+  rollback_allowed: true
+  default_publish_parent_strategy: default_parent_page_id
+  default_labels_csv: cg-origin-chatgpt,cg-state-published
+  default_content_properties_json: '{"origin": "chatgpt", "managedBy": "cg-mcp-gateway"}'
+  notes: Mode recommandé pour comptes-rendus, décisions et synthèses.
+- publication_policy_key: pp_managed_sections_reviewed
+  description: Mise à jour autorisée uniquement dans des sections balisées cg:managed
+    après validation humaine.
+  approval_required: true
+  create_mode: current_page
+  update_mode: managed_sections
+  publish_after_approval: true
+  max_pages_per_operation: 1
+  diff_required: true
+  rollback_allowed: true
+  default_publish_parent_strategy: target_page_or_default_parent
+  default_labels_csv: cg-origin-chatgpt,cg-state-published
+  default_content_properties_json: '{"origin": "chatgpt", "managedBy": "cg-mcp-gateway",
+    "updateMode": "managed_sections"}'
+  notes: À utiliser pour runbooks, feuilles d’action, pages de pilotage vivantes.
+- publication_policy_key: pp_draft_only_human_publish
+  description: Le publisher ne crée qu’un brouillon ou une page en AI Inbox ; la publication
+    finale est effectuée manuellement par l’approbateur dans Confluence.
+  approval_required: true
+  create_mode: draft_only
+  update_mode: none
+  publish_after_approval: false
+  max_pages_per_operation: 1
+  diff_required: true
+  rollback_allowed: true
+  default_publish_parent_strategy: ai_inbox_page_id
+  default_labels_csv: cg-origin-chatgpt,cg-state-pending
+  default_content_properties_json: '{"origin": "chatgpt", "managedBy": "cg-mcp-gateway",
+    "lifecycle": "pending_manual_publish"}'
+  notes: Mode le plus prudent pour espaces clients sensibles.
+approver_groups:
+- approver_group_key: ag-commercial-leads
+  principal_type: external_directory_group
+  principal_ref: cg-commercial-approvers
+  display_name: Cybergogne – Référents validation commerciale
+  quorum_rule: one_of
+  quorum_value: 1
+  escalation_group_key: ''
+  active: true
+  notes: Validation d’un responsable commercial ou direction.
+- approver_group_key: ag-finance-leads
+  principal_type: external_directory_group
+  principal_ref: cg-finance-approvers
+  display_name: Cybergogne – Référents validation financière
+  quorum_rule: one_of
+  quorum_value: 1
+  escalation_group_key: ''
+  active: true
+  notes: Validation d’un responsable finance/administration.
+- approver_group_key: ag-smdm-validation
+  principal_type: external_directory_group
+  principal_ref: client-smdm-approvers
+  display_name: Saint-Martin-de-la-Mer – Groupe de validation
+  quorum_rule: one_of
+  quorum_value: 1
+  escalation_group_key: ''
+  active: true
+  notes: À remplacer par le groupe réel ou la liste d’approbateurs nominative.
+- approver_group_key: ag-pam-programme
+  principal_type: external_directory_group
+  principal_ref: program-pam-approvers
+  display_name: Pays Auxois Morvan – Référents programme
+  quorum_rule: one_of
+  quorum_value: 1
+  escalation_group_key: ''
+  active: true
+  notes: Appropriation progressive à l’échelle territoire.
+scope_registry:
+- scope_id: internal-commercial-prod
+  enabled: true
+  environment: prod
+  tenant_id: cybergogne-internal
+  scope_kind: internal_domain
+  chatgpt_project_slug: gc-commercial
+  knowledge_app_slug: cg-commercial-knowledge
+  publisher_app_slug: cg-commercial-publisher
+  atlassian_site: cybergogne.atlassian.net
+  confluence_space_key: CYBCOM
+  confluence_space_id: ''
+  root_page_id: '100100100'
+  default_parent_page_id: '100100120'
+  ai_inbox_page_id: '100100190'
+  approver_group_key: ag-commercial-leads
+  publication_policy_key: pp_append_only_reviewed
+  identity_mode: managed_scope
+  write_target_mode: append_only
+  read_cql_guard: space = "CYBCOM" AND ancestor = 100100100
+  allowed_doc_types_csv: decision,compte-rendu,synthese,action-log
+  allowed_template_ids_csv: tpl-decision,tpl-compte-rendu,tpl-synthese,tpl-action-log
+  required_labels_csv: cg-scope-commercial,cg-origin-chatgpt
+  forbidden_labels_csv: cg-legal-hold,cg-confidential-client
+  owner_ref: direction@cybergogne.local
+  notes: Scope interne commercial.
+- scope_id: internal-finance-prod
+  enabled: true
+  environment: prod
+  tenant_id: cybergogne-internal
+  scope_kind: internal_domain
+  chatgpt_project_slug: gc-finance
+  knowledge_app_slug: cg-finance-knowledge
+  publisher_app_slug: cg-finance-publisher
+  atlassian_site: cybergogne.atlassian.net
+  confluence_space_key: CYBFIN
+  confluence_space_id: ''
+  root_page_id: '100200100'
+  default_parent_page_id: '100200120'
+  ai_inbox_page_id: '100200190'
+  approver_group_key: ag-finance-leads
+  publication_policy_key: pp_managed_sections_reviewed
+  identity_mode: managed_scope
+  write_target_mode: managed_sections
+  read_cql_guard: space = "CYBFIN" AND ancestor = 100200100
+  allowed_doc_types_csv: decision,compte-rendu,synthese,action-log
+  allowed_template_ids_csv: tpl-decision,tpl-compte-rendu,tpl-synthese,tpl-action-log
+  required_labels_csv: cg-scope-finance,cg-origin-chatgpt
+  forbidden_labels_csv: cg-legal-hold,cg-payroll-restricted
+  owner_ref: finance@cybergogne.local
+  notes: Scope interne finance ; mises à jour seulement dans sections balisées.
+- scope_id: client-smdm-prod
+  enabled: true
+  environment: prod
+  tenant_id: client-smdm
+  scope_kind: client_project
+  chatgpt_project_slug: client-saint-martin-de-la-mer
+  knowledge_app_slug: cg-smdm-knowledge
+  publisher_app_slug: cg-smdm-publisher
+  atlassian_site: cybergogne.atlassian.net
+  confluence_space_key: CLSMDM
+  confluence_space_id: ''
+  root_page_id: '200100100'
+  default_parent_page_id: '200100120'
+  ai_inbox_page_id: '200100190'
+  approver_group_key: ag-smdm-validation
+  publication_policy_key: pp_draft_only_human_publish
+  identity_mode: managed_scope
+  write_target_mode: append_only
+  read_cql_guard: space = "CLSMDM" AND ancestor = 200100100
+  allowed_doc_types_csv: decision,compte-rendu,synthese,action-log,communication
+  allowed_template_ids_csv: tpl-decision,tpl-compte-rendu,tpl-synthese,tpl-action-log,tpl-communication
+  required_labels_csv: cg-client-smdm,cg-origin-chatgpt
+  forbidden_labels_csv: cg-legal-hold,cg-rgpd-sensitive
+  owner_ref: client-owner-smdm
+  notes: 'Mode prudent : brouillon / AI Inbox uniquement avant publication manuelle.'
+- scope_id: program-auxois-morvan-prod
+  enabled: true
+  environment: prod
+  tenant_id: programme-pam
+  scope_kind: territory_program
+  chatgpt_project_slug: programme-auxois-morvan
+  knowledge_app_slug: cg-pam-knowledge
+  publisher_app_slug: cg-pam-publisher
+  atlassian_site: cybergogne.atlassian.net
+  confluence_space_key: PAM
+  confluence_space_id: ''
+  root_page_id: '300100100'
+  default_parent_page_id: '300100120'
+  ai_inbox_page_id: '300100190'
+  approver_group_key: ag-pam-programme
+  publication_policy_key: pp_append_only_reviewed
+  identity_mode: managed_scope
+  write_target_mode: append_only
+  read_cql_guard: space = "PAM" AND ancestor = 300100100
+  allowed_doc_types_csv: diagnostic,compte-rendu,synthese,action-log
+  allowed_template_ids_csv: tpl-diagnostic,tpl-compte-rendu,tpl-synthese,tpl-action-log
+  required_labels_csv: cg-program-pam,cg-origin-chatgpt
+  forbidden_labels_csv: cg-legal-hold
+  owner_ref: program-owner-pam
+  notes: Prépare l’extension du dispositif à l’échelle territoire.
