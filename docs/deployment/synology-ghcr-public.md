@@ -88,7 +88,7 @@ dans un dossier qui contient deja un fichier compose:
 ### `postgres`
 
 - image `postgres:16-alpine`
-- persistance dans `./data/postgres`
+- persistance via le volume Docker nomme `postgres-data`
 - acces inter-conteneurs uniquement via le reseau Compose interne
 - aucun port hote ne doit etre publie pour `5432`
 - healthcheck `pg_isready`

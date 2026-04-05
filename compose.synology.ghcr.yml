@@ -9,7 +9,7 @@ services:
     env_file:
       - ./.env.synology.ghcr
     volumes:
-      - ./data/postgres:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
     networks:
       - backend
     healthcheck:
@@ -42,3 +42,6 @@ services:
 networks:
   backend:
     driver: bridge
+
+volumes:
+  postgres-data:
