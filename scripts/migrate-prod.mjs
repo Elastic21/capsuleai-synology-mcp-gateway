@@ -1,7 +1,10 @@
 import path from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
-import { loadEnv } from '@cybergogne/common';
-import { createSqlClient, migrateDirectory } from '@cybergogne/registry';
+// This script is executed from the repository root inside the production image.
+// Import built workspace outputs by relative path because root-level node resolution
+// does not include pnpm workspace links for @cybergogne/* packages.
+import { loadEnv } from '../packages/common/dist/index.js';
+import { createSqlClient, migrateDirectory } from '../packages/registry/dist/index.js';
 
 const env = loadEnv();
 const maxAttempts = Math.max(1, Number(process.env.MIGRATE_MAX_ATTEMPTS ?? '30'));
