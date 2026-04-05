@@ -34,6 +34,9 @@ Point important:
 
 - lors du premier publish GHCR, la visibilite du package est generalement privee par defaut
 - pour permettre un pull anonyme par Synology, basculez le package en **public**
+- selon les ecrans `Container Manager`, Synology peut proposer un mapping de port pour PostgreSQL
+- refusez ou supprimez tout `5432:5432` sur le service `postgres`
+- seul `mcp-server` doit publier un port hote, ici `8787:8787`
 
 ## Nom d'image
 
@@ -44,7 +47,7 @@ Par defaut, le workflow publie:
 
 Exemple:
 
-- `ghcr.io/cybergogne/cg-gateway-mcp-repo:latest`
+- `ghcr.io/elastic21/capsuleai-synology-mcp-gateway:latest`
 
 ## Configuration Synology
 
@@ -75,6 +78,8 @@ Si Container Manager n'applique pas `GHCR_IMAGE` a la substitution Compose dans 
 
 - image `postgres:16-alpine`
 - persistance dans `./data/postgres`
+- acces inter-conteneurs uniquement via le reseau Compose interne
+- aucun port hote ne doit etre publie pour `5432`
 - healthcheck `pg_isready`
 
 ### `mcp-server`
