@@ -13,6 +13,7 @@
     "migrate": "tsx scripts/migrate.ts",
     "migrate:prod": "node scripts/migrate-prod.mjs",
     "seed:registry": "tsx scripts/seed-registry.ts",
+    "seed:registry:prod": "node scripts/seed-registry-prod.mjs",
     "export:registry": "tsx scripts/export-registry.ts",
     "bootstrap:discover": "tsx scripts/bootstrap-discover.ts",
     "bootstrap:validate": "tsx scripts/bootstrap-validate.ts",

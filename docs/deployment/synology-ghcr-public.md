@@ -118,6 +118,30 @@ dans un dossier qui contient deja un fichier compose:
 2. attendre la publication GHCR
 3. redeployer ou relancer le projet dans DSM pour tirer la nouvelle image
 
+## Alimentation initiale du registre de scopes
+
+Les migrations creent la structure PostgreSQL, mais elles n'inserent pas de scopes par defaut.
+Tant que `cg_scope_registry` est vide, les appels `search_knowledge` ou `fetch_page` ne
+peuvent pas resoudre de perimetre.
+
+Pour charger un registre initial depuis le conteneur `mcp-server`:
+
+```sh
+docker exec -it cg-gateway-mcp node scripts/seed-registry-prod.mjs /app/cg_scope_registry_v1_examples.yaml
+```
+
+Puis verifiez le contenu en base:
+
+```sh
+docker exec -it cg-gateway-postgres psql -U postgres -d cg_gateway -c "select scope_id, environment, enabled, confluence_space_key from cg_scope_registry order by scope_id;"
+```
+
+Important:
+
+- `cg_scope_registry_v1_examples.yaml` est un exemple de seed, pas forcement votre registre reel
+- pour un deploiement reel, preparez un YAML avec vos vrais espaces Confluence, pages racines et approbateurs
+- si vous mettez a jour ce YAML dans le repo, redeployez l'image ou montez le fichier dans le conteneur avant de relancer la commande
+
 ## Variante recommandee
 
 Pour une meilleure stabilite de deploiement sur DSM, vous pouvez figer l'image par tag semantique plutot que `latest`, par exemple:
