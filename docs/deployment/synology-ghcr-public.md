@@ -8,6 +8,8 @@ Cette cible evite le build local sur le NAS. L'image est construite par GitHub A
 - `compose.synology.ghcr.yml`
 - `.env.synology.ghcr.example`
 - `Dockerfile.prod`
+- `deployment/synology-ghcr/docker-compose.yml`
+- `deployment/synology-ghcr/.env.synology.ghcr.example`
 
 ## Principe
 
@@ -63,14 +65,23 @@ Si Container Manager n'applique pas `GHCR_IMAGE` a la substitution Compose dans 
 
 - editez directement la ligne `image:` dans `compose.synology.ghcr.yml`
 
+Si `Container Manager` ne vous laisse pas choisir un fichier autre que `docker-compose.yml`
+dans un dossier qui contient deja un fichier compose:
+
+- utilisez de preference le dossier `deployment/synology-ghcr`
+- ce dossier contient deja un `docker-compose.yml` dedie au deploiement DSM
+- copiez `deployment/synology-ghcr/.env.synology.ghcr.example` vers `deployment/synology-ghcr/.env.synology.ghcr`
+- pointez ensuite le projet DSM vers ce dossier dedie, et non vers la racine du depot
+
 ## Import dans DSM
 
 1. ouvrir `Container Manager`
 2. aller dans `Project`
-3. creer un nouveau projet dans le dossier partage contenant le depot
-4. selectionner `compose.synology.ghcr.yml`
-5. verifier que `.env.synology.ghcr` est present dans le meme dossier
-6. lancer le projet
+3. creer un nouveau projet dans le dossier partage contenant le compose retenu
+4. si DSM impose `docker-compose.yml`, choisir `deployment/synology-ghcr`
+5. sinon vous pouvez aussi utiliser `compose.synology.ghcr.yml` a la racine
+6. verifier que `.env.synology.ghcr` est present dans le meme dossier que le compose retenu
+7. lancer le projet
 
 ## Services
 
