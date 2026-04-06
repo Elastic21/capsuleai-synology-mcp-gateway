@@ -46,6 +46,8 @@ services:
 networks:
   backend:
     driver: bridge
+    driver_opts:
+      com.docker.network.bridge.enable_icc: "true"
 
 volumes:
   postgres-data:

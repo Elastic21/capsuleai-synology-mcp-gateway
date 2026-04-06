@@ -91,6 +91,7 @@ dans un dossier qui contient deja un fichier compose:
 - persistance via le volume Docker nomme `postgres-data`
 - acces inter-conteneurs uniquement via le reseau Compose interne
 - ecoute forcee sur toutes les interfaces du conteneur via `listen_addresses=*`
+- communication inter-conteneurs explicitement autorisee sur le bridge Docker via `enable_icc=true`
 - aucun port hote ne doit etre publie pour `5432`
 - healthcheck `pg_isready`
 
