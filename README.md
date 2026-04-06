@@ -102,6 +102,7 @@ pnpm bootstrap:report --source ./out/resolved-registry.yaml
 
 - [Catalogue d'outils](./docs/api/tool-catalog.md)
 - [Divergences de spec / API](./docs/api/spec-divergences.md)
+- [Plan de recette fonctionnelle](./docs/runbooks/functional-test-plan.md)
 - [Deploiement Synology DSM](./docs/deployment/synology-dsm.md)
 - [Deploiement Synology via GHCR public](./docs/deployment/synology-ghcr-public.md)
 - [Prompt de demarrage Codex](./docs/codex/kickoff-prompt.md)
