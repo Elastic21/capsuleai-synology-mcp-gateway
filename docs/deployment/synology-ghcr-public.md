@@ -90,6 +90,7 @@ dans un dossier qui contient deja un fichier compose:
 - image `postgres:16-alpine`
 - persistance via le volume Docker nomme `postgres-data`
 - acces inter-conteneurs uniquement via le reseau Compose interne
+- ecoute forcee sur toutes les interfaces du conteneur via `listen_addresses=*`
 - aucun port hote ne doit etre publie pour `5432`
 - healthcheck `pg_isready`
 
