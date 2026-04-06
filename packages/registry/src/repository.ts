@@ -4,6 +4,12 @@ import type { SqlClient } from './db.js';
 
 const json = (value: unknown) => JSON.stringify(value ?? null);
 
+export function normalizeNullableText(value?: string | null) {
+  if (value == null) return null;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
 function onlyOne<T>(rows: T[]): T | null {
   if (rows.length === 0) return null;
   return rows[0];
@@ -84,7 +90,7 @@ export class RegistryRepository {
         quorum_rule, quorum_value, escalation_group_key, active, notes
       ) values (
         ${record.approver_group_key}, ${record.principal_type}, ${record.principal_ref}, ${record.display_name},
-        ${record.quorum_rule}, ${record.quorum_value ?? null}, ${record.escalation_group_key ?? null}, ${record.active}, ${record.notes ?? null}
+        ${record.quorum_rule}, ${record.quorum_value ?? null}, ${normalizeNullableText(record.escalation_group_key)}, ${record.active}, ${normalizeNullableText(record.notes)}
       )
       on conflict (approver_group_key) do update set
         principal_type = excluded.principal_type,
@@ -144,11 +150,11 @@ export class RegistryRepository {
       ) values (
         ${record.scope_id}, ${record.enabled}, ${record.environment}, ${record.tenant_id}, ${record.scope_kind},
         ${record.chatgpt_project_slug}, ${record.knowledge_app_slug}, ${record.publisher_app_slug},
-        ${record.atlassian_site}, ${record.confluence_space_key}, ${record.confluence_space_id ?? null},
+        ${record.atlassian_site}, ${record.confluence_space_key}, ${normalizeNullableText(record.confluence_space_id)},
         ${record.root_page_id}, ${record.default_parent_page_id}, ${record.ai_inbox_page_id},
         ${record.approver_group_key}, ${record.publication_policy_key}, ${record.identity_mode}, ${record.write_target_mode},
         ${record.read_cql_guard}, ${json(record.allowed_doc_types)}::jsonb, ${json(record.allowed_template_ids)}::jsonb,
-        ${json(record.required_labels)}::jsonb, ${json(record.forbidden_labels)}::jsonb, ${record.owner_ref ?? null}, ${record.notes ?? null}
+        ${json(record.required_labels)}::jsonb, ${json(record.forbidden_labels)}::jsonb, ${normalizeNullableText(record.owner_ref)}, ${normalizeNullableText(record.notes)}
       )
       on conflict (scope_id) do update set
         enabled = excluded.enabled,

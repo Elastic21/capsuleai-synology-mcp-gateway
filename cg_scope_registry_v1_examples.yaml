@@ -52,7 +52,7 @@ approver_groups:
   display_name: Cybergogne – Référents validation commerciale
   quorum_rule: one_of
   quorum_value: 1
-  escalation_group_key: ''
+  escalation_group_key:
   active: true
   notes: Validation d’un responsable commercial ou direction.
 - approver_group_key: ag-finance-leads
@@ -61,7 +61,7 @@ approver_groups:
   display_name: Cybergogne – Référents validation financière
   quorum_rule: one_of
   quorum_value: 1
-  escalation_group_key: ''
+  escalation_group_key:
   active: true
   notes: Validation d’un responsable finance/administration.
 - approver_group_key: ag-smdm-validation
@@ -70,7 +70,7 @@ approver_groups:
   display_name: Saint-Martin-de-la-Mer – Groupe de validation
   quorum_rule: one_of
   quorum_value: 1
-  escalation_group_key: ''
+  escalation_group_key:
   active: true
   notes: À remplacer par le groupe réel ou la liste d’approbateurs nominative.
 - approver_group_key: ag-pam-programme
@@ -79,7 +79,7 @@ approver_groups:
   display_name: Pays Auxois Morvan – Référents programme
   quorum_rule: one_of
   quorum_value: 1
-  escalation_group_key: ''
+  escalation_group_key:
   active: true
   notes: Appropriation progressive à l’échelle territoire.
 scope_registry:
