@@ -4,13 +4,16 @@ services:
     container_name: cg-gateway-postgres
     restart: unless-stopped
     command: ["postgres", "-c", "listen_addresses=*"]
-    # Internal service only: do not publish 5432 on the Synology host.
+    # Published on the Synology host so the application container can connect
+    # through host networking when bridge traffic is unreliable on DSM.
     expose:
       - "5432"
     env_file:
       - ./.env.synology.ghcr
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "15432:5432"
     networks:
       backend:
         aliases:
@@ -24,24 +27,21 @@ services:
       start_period: 10s
 
   mcp-server:
-    image: ${GHCR_IMAGE:-ghcr.io/replace-me-owner/cg-gateway-mcp-repo:latest}
+    image: ${GHCR_IMAGE:-ghcr.io/elastic21/capsuleai-synology-mcp-gateway:latest}
     container_name: cg-gateway-mcp
     restart: unless-stopped
+    network_mode: host
     depends_on:
       postgres:
         condition: service_healthy
     env_file:
       - ./.env.synology.ghcr
-    ports:
-      - "8787:8787"
     healthcheck:
       test: ["CMD-SHELL", "wget -q -O /dev/null \"http://127.0.0.1:$${PORT:-8787}/\" || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 5
       start_period: 25s
-    networks:
-      - backend
 
 networks:
   backend:

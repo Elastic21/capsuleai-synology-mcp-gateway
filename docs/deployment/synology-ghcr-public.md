@@ -37,8 +37,8 @@ Point important:
 - lors du premier publish GHCR, la visibilite du package est generalement privee par defaut
 - pour permettre un pull anonyme par Synology, basculez le package en **public**
 - selon les ecrans `Container Manager`, Synology peut proposer un mapping de port pour PostgreSQL
-- refusez ou supprimez tout `5432:5432` sur le service `postgres`
-- seul `mcp-server` doit publier un port hote, ici `8787:8787`
+- n'utilisez pas `5432:5432`; la cible DSM publie PostgreSQL sur `15432:5432`
+- `mcp-server` tourne en `network_mode: host` sur DSM et ecoute directement sur `8787`
 
 ## Nom d'image
 
@@ -89,16 +89,17 @@ dans un dossier qui contient deja un fichier compose:
 
 - image `postgres:16-alpine`
 - persistance via le volume Docker nomme `postgres-data`
-- acces inter-conteneurs uniquement via le reseau Compose interne
+- acces local via le port hote `15432`
 - ecoute forcee sur toutes les interfaces du conteneur via `listen_addresses=*`
 - communication inter-conteneurs explicitement autorisee sur le bridge Docker via `enable_icc=true`
-- aucun port hote ne doit etre publie pour `5432`
+- publication hote `15432:5432`
 - healthcheck `pg_isready`
 
 ### `mcp-server`
 
 - image tiree depuis GHCR public
-- exposition HTTP sur `8787`
+- execution en `network_mode: host` pour contourner les problemes de trafic TCP inter-conteneurs observes sur certains DSM
+- exposition HTTP directe sur `8787`
 - migrations au demarrage via `MIGRATE_ON_BOOT=true`
 
 ## Avantages
