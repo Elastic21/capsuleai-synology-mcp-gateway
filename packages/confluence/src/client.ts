@@ -16,6 +16,23 @@ function escapeCql(value: string): string {
   return value.replaceAll('\\', '\\\\').replaceAll('"', '\\\"');
 }
 
+function mapSearchResult(baseUrl: string, result: any) {
+  const content = result.content ?? result;
+  return {
+    page_id: String(content.id ?? result.id ?? ''),
+    title: result.title ?? content.title ?? '',
+    excerpt: result.excerpt ?? content.excerpt ?? '',
+    version: content.version?.number ?? null,
+    labels:
+      content.metadata?.labels?.results?.map((item: any) => item.name).filter(Boolean) ?? [],
+    web_url: content._links?.webui
+      ? `${baseUrl}${content._links.webui}`
+      : null,
+    ancestor_ids:
+      content.ancestors?.map((item: any) => String(item.id)) ?? [],
+  };
+}
+
 export class ConfluenceClient {
   private readonly baseUrl: string;
 
@@ -138,21 +155,20 @@ export class ConfluenceClient {
   async searchByCqlRaw(cql: string, limit = 10, cursor?: string | null) {
     const qs = new URLSearchParams({ cql, limit: String(limit) });
     if (cursor) qs.set('cursor', cursor);
-    const data = await this.request<any>(`/wiki/rest/api/search?${qs.toString()}`);
+    let data: any;
+
+    try {
+      data = await this.request<any>(`/wiki/rest/api/content/search?${qs.toString()}`);
+    } catch (error) {
+      if (!(error instanceof AppError) || error.statusCode !== 404) {
+        throw error;
+      }
+
+      data = await this.request<any>(`/wiki/rest/api/search?${qs.toString()}`);
+    }
+
     return {
-      results: (data.results ?? []).map((result: any) => ({
-        page_id: String(result.content?.id ?? result.id ?? ''),
-        title: result.title ?? result.content?.title ?? '',
-        excerpt: result.excerpt ?? '',
-        version: result.content?.version?.number ?? null,
-        labels:
-          result.content?.metadata?.labels?.results?.map((item: any) => item.name).filter(Boolean) ?? [],
-        web_url: result.content?._links?.webui
-          ? `${this.baseUrl}${result.content._links.webui}`
-          : null,
-        ancestor_ids:
-          result.content?.ancestors?.map((item: any) => String(item.id)) ?? [],
-      })),
+      results: (data.results ?? []).map((result: any) => mapSearchResult(this.baseUrl, result)),
       nextCursor: data._links?.next ?? null,
     };
   }

@@ -63,3 +63,19 @@ Divergence d'implementation:
 Raison:
 
 - garder un widget statique, simple a servir et host-agnostic dans ce squelette V1
+
+## 5. Endpoint de recherche Confluence
+
+La V1 utilisait initialement `GET /wiki/rest/api/search` pour les recherches CQL.
+Sur certains tenants Confluence Cloud, ce endpoint peut repondre `404` alors que
+`GET /wiki/rest/api/content/search` reste disponible pour les recherches de pages.
+
+Decision appliquee:
+
+- `search_knowledge` tente d'abord `GET /wiki/rest/api/content/search`
+- en cas de `404`, le client bascule automatiquement sur `GET /wiki/rest/api/search`
+
+Impact:
+
+- comportement plus robuste entre tenants Cloud
+- pas de changement sur le controle de scope ni sur le format de sortie MCP
