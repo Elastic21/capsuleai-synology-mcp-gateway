@@ -3,7 +3,7 @@ import { createServer, type IncomingMessage, type ServerResponse } from 'node:ht
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { isInitializeRequest } from '@modelcontextprotocol/sdk/types.js';
+import { isInitializeRequest, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import { AppError, toAppError } from '@cybergogne/common';
 import { createAppContext } from './context.js';
 import type { AppContext } from './context.js';
@@ -15,6 +15,7 @@ import {
 } from './http-auth.js';
 import { registerResources } from './resources.js';
 import { registerTools } from './tools.js';
+import { filterModelVisibleTools } from './tool-visibility.js';
 
 const MCP_PATH = '/mcp';
 
@@ -33,7 +34,21 @@ function createMcpServer() {
   const server = new McpServer({ name: 'cybergogne-gateway-mcp', version: '0.1.0' });
   registerResources(server, context.widgetPath);
   registerTools(server, context);
+  installModelToolListFilter(server);
   return { server, context };
+}
+
+function installModelToolListFilter(server: McpServer) {
+  const protocolServer = server.server as any;
+  const existingHandler = protocolServer._requestHandlers?.get('tools/list');
+  if (!existingHandler) {
+    return;
+  }
+
+  protocolServer.setRequestHandler(ListToolsRequestSchema, async (request: any, extra: any) => {
+    const result = await existingHandler(request, extra);
+    return filterModelVisibleTools(result);
+  });
 }
 
 export async function runStdioServer() {

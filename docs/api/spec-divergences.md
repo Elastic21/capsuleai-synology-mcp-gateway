@@ -79,3 +79,21 @@ Impact:
 
 - comportement plus robuste entre tenants Cloud
 - pas de changement sur le controle de scope ni sur le format de sortie MCP
+
+## 6. Widget-only et `tools/list`
+
+La V1 supposait que `_meta.ui.visibility = ["app"]` suffirait a masquer les outils
+sensibles au modele. Avec `@modelcontextprotocol/sdk@1.29.0` et `ext-apps@1.5.0`,
+le handler standard `tools/list` retourne pourtant tous les outils enregistres.
+
+Decision appliquee:
+
+- la gateway remplace explicitement le handler `tools/list`
+- les outils `approve_proposal`, `reject_proposal`, `publish_approved_proposal`
+  et `rollback_publication` sont filtres du catalogue expose au modele
+- le widget continue de pouvoir les appeler explicitement par `tools/call`
+
+Impact:
+
+- le catalogue modele respecte la contrainte `widget-only`
+- divergence de comportement du SDK documentee et neutralisee cote serveur
