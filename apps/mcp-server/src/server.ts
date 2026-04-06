@@ -3,7 +3,7 @@ import { createServer, type IncomingMessage, type ServerResponse } from 'node:ht
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { isInitializeRequest, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
+import { CallToolRequestSchema, isInitializeRequest, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import { AppError, toAppError } from '@cybergogne/common';
 import { createAppContext } from './context.js';
 import type { AppContext } from './context.js';
@@ -15,7 +15,11 @@ import {
 } from './http-auth.js';
 import { registerResources } from './resources.js';
 import { registerTools } from './tools.js';
-import { filterModelVisibleTools } from './tool-visibility.js';
+import {
+  buildWidgetOnlyToolDeniedResult,
+  filterModelVisibleTools,
+  isAuthorizedWidgetToolCall,
+} from './tool-visibility.js';
 
 const MCP_PATH = '/mcp';
 
@@ -35,6 +39,7 @@ function createMcpServer() {
   registerResources(server, context.widgetPath);
   registerTools(server, context);
   installModelToolListFilter(server);
+  installWidgetToolCallGuard(server);
   return { server, context };
 }
 
@@ -48,6 +53,22 @@ function installModelToolListFilter(server: McpServer) {
   protocolServer.setRequestHandler(ListToolsRequestSchema, async (request: any, extra: any) => {
     const result = await existingHandler(request, extra);
     return filterModelVisibleTools(result);
+  });
+}
+
+function installWidgetToolCallGuard(server: McpServer) {
+  const protocolServer = server.server as any;
+  const existingHandler = protocolServer._requestHandlers?.get('tools/call');
+  if (!existingHandler) {
+    return;
+  }
+
+  protocolServer.setRequestHandler(CallToolRequestSchema, async (request: any, extra: any) => {
+    if (!isAuthorizedWidgetToolCall(request?.params)) {
+      return buildWidgetOnlyToolDeniedResult(String(request?.params?.name ?? 'unknown'));
+    }
+
+    return existingHandler(request, extra);
   });
 }
 

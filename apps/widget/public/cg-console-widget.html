@@ -154,7 +154,11 @@
       async function callTool(name, args, options = {}) {
         setState({ pendingAction: name, error: null });
         try {
-          const result = await rpcRequest("tools/call", { name, arguments: args });
+          const params = { name, arguments: args };
+          if (options.appOnly) {
+            params._meta = { "io.cybergogne/widget-call": true };
+          }
+          const result = await rpcRequest("tools/call", params);
           const structured = result && isObj(result) ? result.structuredContent : null;
           if (structured && structured.widgetView === "search" && options.mergeSearch) {
             structured.results = arr(state.latestPayload && state.latestPayload.results).concat(arr(structured.results));
@@ -266,12 +270,12 @@
           return;
         }
         if (!proposal || !proposal.proposal_id) { setState({ error: "Aucune proposition active dans le widget." }); return; }
-        if (action === "approve") { await callTool("approve_proposal", { proposal_id: proposal.proposal_id }); return; }
-        if (action === "reject") { await callTool("reject_proposal", { proposal_id: proposal.proposal_id }); return; }
-        if (action === "publish") { await callTool("publish_approved_proposal", { proposal_id: proposal.proposal_id }); return; }
+        if (action === "approve") { await callTool("approve_proposal", { proposal_id: proposal.proposal_id }, { appOnly: true }); return; }
+        if (action === "reject") { await callTool("reject_proposal", { proposal_id: proposal.proposal_id }, { appOnly: true }); return; }
+        if (action === "publish") { await callTool("publish_approved_proposal", { proposal_id: proposal.proposal_id }, { appOnly: true }); return; }
         if (action === "rollback") {
           if (!publication || !publication.publication_id) { setState({ error: "Rollback impossible: aucune publication referencee." }); return; }
-          await callTool("rollback_publication", { publication_id: publication.publication_id });
+          await callTool("rollback_publication", { publication_id: publication.publication_id }, { appOnly: true });
         }
       }
       appEl.addEventListener("click", (event) => {
