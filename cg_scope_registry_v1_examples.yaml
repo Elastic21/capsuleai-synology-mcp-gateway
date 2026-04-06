@@ -91,23 +91,23 @@ scope_registry:
   chatgpt_project_slug: gc-commercial
   knowledge_app_slug: cg-commercial-knowledge
   publisher_app_slug: cg-commercial-publisher
-  atlassian_site: cybergogne.atlassian.net
-  confluence_space_key: CYBCOM
-  confluence_space_id: ''
-  root_page_id: '100100100'
-  default_parent_page_id: '100100120'
-  ai_inbox_page_id: '100100190'
+  atlassian_site: cybergogne-team.atlassian.net
+  confluence_space_key: Commercial
+  confluence_space_id: '11763716'
+  root_page_id: '11763965'
+  default_parent_page_id: '11763965'
+  ai_inbox_page_id: '11763965'
   approver_group_key: ag-commercial-leads
   publication_policy_key: pp_append_only_reviewed
   identity_mode: managed_scope
   write_target_mode: append_only
-  read_cql_guard: space = "CYBCOM" AND ancestor = 100100100
+  read_cql_guard: space = "Commercial" AND ancestor = 11763965
   allowed_doc_types_csv: decision,compte-rendu,synthese,action-log
   allowed_template_ids_csv: tpl-decision,tpl-compte-rendu,tpl-synthese,tpl-action-log
   required_labels_csv: cg-scope-commercial,cg-origin-chatgpt
   forbidden_labels_csv: cg-legal-hold,cg-confidential-client
-  owner_ref: direction@cybergogne.local
-  notes: Scope interne commercial.
+  owner_ref: michel.ract-mugnerot@cybergogne.fr
+  notes: Scope commercial aligne sur l'espace Confluence reel Commercial et sa page racine.
 - scope_id: internal-finance-prod
   enabled: true
   environment: prod
